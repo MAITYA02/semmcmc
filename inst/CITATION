@@ -4,10 +4,11 @@ year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date, perl = TRUE)
 vers <- paste("R package version", meta$Version)
 
 bibentry(bibtype = "Article",
-         title = "Bias Reduction in Logistic Regression with Missing Responses When the Missing Data Mechanism is Nonignorable",
+         title = "Bayesian Structural Equation Modeling in Lifetime Data with Application to Circadian Genes",
          author = c(person("Maity", "Arnab Kumar"),
-                    person("Pradhan", "Vivek"),
-                    person("Das", "Ujjwal")),
+                    person("Sarkar", "Tapasree Roy"),
+                    person("Lee", "Sang Chan"),
+                    person("Mallick", "Bani K.")),
          journal = "The American Statistician",
          pages = "1-10",
          year = "2018",
