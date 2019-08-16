@@ -1,4 +1,39 @@
-mcmcv5 <- function(ct, u1, u2, X, ...)
+#' @title mcmc function
+#' @description MCMC routine for the strucatural equation model
+#' 
+#' @param ct survival response, a \eqn{n*2} matrix with first column as response and second column as right censored indicator,
+#' 1 is event time and 0 is right censored.
+#' @param X Matrix of covariates, dimension \eqn{n*p}.
+#' @param u1 Matix of predictors from the first platform, dimension \eqn{n*q_1}
+#' @param u2 Matix of predictors from the first platform, dimension \eqn{n*q_2}
+#' @param nthin thinning parameter. Default is 1 (no thinning)
+#' 
+#' @return \item{pMean.beta.t}{}
+#' \item{pMean.beta.t}{} 
+#' \item{pMean.alpha.t}{}
+#' \item{pMean.alpha.t}{} 
+#' \item{pMean.phi.t}{} 
+#' \item{pMean.phi.t}{}
+#' \item{pMean.alpha.u1}{} = pMean.alpha.u1, pMean.alpha.u2 = pMean.alpha.u2, 
+pMean.phi.u1 = pMean.phi.u1, pMean.phi.u2 = pMean.phi.u2, 
+pMean.eta1 = pMean.eta1, pMean.eta2 = pMean.eta2, 
+pMean.sigma.t.square = pMean.sigma.t.square, 
+pMean.sigma.u1.square = pMean.sigma.u1.square, pMean.sigma.u2.square = pMean.sigma.u2.square,
+alpha.t.samples = alpha.tout, phi.t.samples = phi.tout, 
+beta1.t.samples = beta.tout[1, ], beta2.t.samples = beta.tout[2, ],
+beta.t.samples = beta.tout,
+alpha.u1.samples = alpha.u1out, alpha.u2.samples = alpha.u2out,
+phi.u1.samples = phi.u1out, phi.u2.samples = phi.u2out, 
+eta1.samples = eta1.out, eta2.samples = eta2.out,
+sigma.t.square.samples = sigma.t.square.out, 
+sigma.u1.square.samples = sigma.u1.square.out, sigma.u2.square.samples = sigma.u2.square.out,
+pMean.logt.hat = pMean.logt.hat, DIC = DIC, WAIC = WAIC
+#'
+#' @importFrom stats dnorm median pnorm rnorm runif
+#' 
+#' @export
+
+mcmc <- function(ct, u1, u2, X, nthin = 1)
 {
   
   n  <- nrow(X)  # sample size
@@ -67,7 +102,7 @@ mcmcv5 <- function(ct, u1, u2, X, ...)
     ## Update survival latent variable ##
     mean.impute       <- alpha.t + as.matrix(X.censored) %*% as.matrix(beta.t) + eta1 * phi.t
     sd.impute         <- sqrt(sigma.t.square)
-    time.censored     <- rtnorm(n.censored, mean = mean.impute, sd = sd.impute, lower = logt.censored)
+    time.censored     <- msm::rtnorm(n.censored, mean = mean.impute, sd = sd.impute, lower = logt.censored)
     logt[censored.id] <- time.censored  # truncated at log(time) for censored data
     
     
@@ -76,21 +111,21 @@ mcmcv5 <- function(ct, u1, u2, X, ...)
     Ainv         <- chol2inv(chol(A))
     Sigma.beta.t <- sigma.t.square * Ainv
     mean.beta.t  <- as.vector(Ainv %*% t(X) %*% (logt - alpha.t - eta1 * phi.t))
-    beta.t       <- as.vector(mvrnorm(n = 1, mu = mean.beta.t, Sigma = Sigma.beta.t))
+    beta.t       <- as.vector(MASS::mvrnorm(n = 1, mu = mean.beta.t, Sigma = Sigma.beta.t))
     
     # Sample $ \alpha_t $
     A             <- crossprod(x = rep(1, n)) + chol2inv(chol(diag(1)))
     Ainv          <- chol2inv(chol(A))
     Sigma.alpha.t <- sigma.t.square * Ainv
     mean.alpha.t  <- as.vector(Ainv %*% t(rep(1, n)) %*% (logt - X %*% beta.t - eta1 * phi.t))
-    alpha.t       <- as.vector(mvrnorm(n = 1, mu = mean.alpha.t, Sigma = Sigma.alpha.t))
+    alpha.t       <- as.vector(MASS::mvrnorm(n = 1, mu = mean.alpha.t, Sigma = Sigma.alpha.t))
     
     # Sample $ \phi_t $
     A           <- crossprod(x = rep(eta1, n)) + chol2inv(chol(diag(1)))
     Ainv        <- chol2inv(chol(A))
     Sigma.phi.t <- Ainv
     mean.phi.t  <- as.vector(Ainv %*% t(rep(eta1, n)) %*% (logt - alpha.t - X %*% beta.t))
-    phi.t       <- as.vector(mvrnorm(n = 1, mu = mean.phi.t, Sigma = Sigma.phi.t))
+    phi.t       <- as.vector(MASS::mvrnorm(n = 1, mu = mean.phi.t, Sigma = Sigma.phi.t))
     
     # Sample $ \alpha_u1 $
     A             <- crossprod(x = rep(1, n)) + chol2inv(chol(diag(1)))
@@ -132,7 +167,7 @@ mcmcv5 <- function(ct, u1, u2, X, ...)
                                 phi.t * sum(logt)/sigma.t.square - sum(phi.u1 * alpha.u1)/sigma.u1.square -
                                 phi.t * alpha.t/sigma.t.square -
                                 (t(beta.t) %*% t(X) %*% rep(phi.t, n))/sigma.t.square)
-    eta1      <- as.vector(mvrnorm(n = 1, mu = mean.eta, Sigma = Sigma.eta))
+    eta1      <- as.vector(MASS::mvrnorm(n = 1, mu = mean.eta, Sigma = Sigma.eta))
     
     # Sample $ \eta2 $
     sum.phi.eta2 <- 0
@@ -143,7 +178,7 @@ mcmcv5 <- function(ct, u1, u2, X, ...)
     Sigma.eta <- 1/(1/sigma.eta1.square + 1/sigma.eta2.square + sum(phi.u2^2)/sigma.u2.square)
     mean.eta  <- Sigma.eta * (eta1/sigma.eta1.square + sum.phi.eta2/sigma.u2.square +
                                 sum(phi.u2 * alpha.u2)/sigma.u2.square)
-    eta2      <- as.vector(mvrnorm(n = 1, mu = mean.eta, Sigma = Sigma.eta))
+    eta2      <- as.vector(MASS::mvrnorm(n = 1, mu = mean.eta, Sigma = Sigma.eta))
     
     
     
