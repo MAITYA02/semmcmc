@@ -15,11 +15,9 @@
 #' \item{pMean.phi.t}{} 
 #' \item{pMean.phi.t}{}
 #' \item{pMean.alpha.u1}{}
-#' \item{pMean.alpha.u1}{}
 #' \item{pMean.alpha.u2}{}
 #' \item{pMean.alpha.u2}{}
 #' \item{pMean.phi.u1}{}
-#' \item{pMean.phi.u2}{}
 #' \item{pMean.eta1}{}
 #' \item{pMean.eta2}{}
 #' \item{pMean.sigma.t.square}{}
