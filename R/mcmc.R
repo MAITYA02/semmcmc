@@ -14,20 +14,34 @@
 #' \item{pMean.alpha.t}{} 
 #' \item{pMean.phi.t}{} 
 #' \item{pMean.phi.t}{}
-#' \item{pMean.alpha.u1}{} = pMean.alpha.u1, pMean.alpha.u2 = pMean.alpha.u2, 
-pMean.phi.u1 = pMean.phi.u1, pMean.phi.u2 = pMean.phi.u2, 
-pMean.eta1 = pMean.eta1, pMean.eta2 = pMean.eta2, 
-pMean.sigma.t.square = pMean.sigma.t.square, 
-pMean.sigma.u1.square = pMean.sigma.u1.square, pMean.sigma.u2.square = pMean.sigma.u2.square,
-alpha.t.samples = alpha.tout, phi.t.samples = phi.tout, 
-beta1.t.samples = beta.tout[1, ], beta2.t.samples = beta.tout[2, ],
-beta.t.samples = beta.tout,
-alpha.u1.samples = alpha.u1out, alpha.u2.samples = alpha.u2out,
-phi.u1.samples = phi.u1out, phi.u2.samples = phi.u2out, 
-eta1.samples = eta1.out, eta2.samples = eta2.out,
-sigma.t.square.samples = sigma.t.square.out, 
-sigma.u1.square.samples = sigma.u1.square.out, sigma.u2.square.samples = sigma.u2.square.out,
-pMean.logt.hat = pMean.logt.hat, DIC = DIC, WAIC = WAIC
+#' \item{pMean.alpha.u1}{}
+#' \item{pMean.alpha.u1}{}
+#' \item{pMean.alpha.u2}{}
+#' \item{pMean.alpha.u2}{}
+#' \item{pMean.phi.u1}{}
+#' \item{pMean.phi.u2}{}
+#' \item{pMean.eta1}{}
+#' \item{pMean.eta2}{}
+#' \item{pMean.sigma.t.square}{}
+#' \item{pMean.sigma.u1.square}{}
+#' \item{pMean.sigma.u2.square}{}
+#' \item{alpha.t.samples}{}
+#' \item{phi.t.samples}{}
+#' \item{beta1.t.samples}{}
+#' \item{beta2.t.samples}{}
+#' \item{beta.t.samples}{}
+#' \item{alpha.u1.samples}{}
+#' \item{alpha.u2.samples}{}
+#' \item{phi.u1.samples}{}
+#' \item{phi.u2.samples}{}
+#' \item{eta1.samples}{}
+#' \item{eta2.samples}{}
+#' \item{sigma.t.square.samples}{}
+#' \item{sigma.u1.square.samples}{}
+#' \item{sigma.u2.square.samples}{}
+#' \item{pMean.logt.hat}{}
+#' \item{DIC}{}
+#' \item{WAIC}{}
 #'
 #' @importFrom stats dnorm median pnorm rnorm runif
 #' 

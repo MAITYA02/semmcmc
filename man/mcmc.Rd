@@ -10,12 +10,49 @@ mcmc(ct, u1, u2, X, nthin = 1)
 \item{ct}{survival response, a \eqn{n*2} matrix with first column as response and second column as right censored indicator,
 1 is event time and 0 is right censored.}
 
+\item{u1}{Matix of predictors from the first platform, dimension \eqn{n*q_1}}
+
 \item{u2}{Matix of predictors from the first platform, dimension \eqn{n*q_2}}
 
-\item{X}{Matrix of covariates, dimension \eqn{n*p}.
-'@param u1 Matix of predictors from the first platform, dimension \eqn{n*q_1}}
+\item{X}{Matrix of covariates, dimension \eqn{n*p}.}
 
 \item{nthin}{thinning parameter. Default is 1 (no thinning)}
+}
+\value{
+\item{pMean.beta.t}{}
+\item{pMean.beta.t}{} 
+\item{pMean.alpha.t}{}
+\item{pMean.alpha.t}{} 
+\item{pMean.phi.t}{} 
+\item{pMean.phi.t}{}
+\item{pMean.alpha.u1}{}
+\item{pMean.alpha.u1}{}
+\item{pMean.alpha.u2}{}
+\item{pMean.alpha.u2}{}
+\item{pMean.phi.u1}{}
+\item{pMean.phi.u2}{}
+\item{pMean.eta1}{}
+\item{pMean.eta2}{}
+\item{pMean.sigma.t.square}{}
+\item{pMean.sigma.u1.square}{}
+\item{pMean.sigma.u2.square}{}
+\item{alpha.t.samples}{}
+\item{phi.t.samples}{}
+\item{beta1.t.samples}{}
+\item{beta2.t.samples}{}
+\item{beta.t.samples}{}
+\item{alpha.u1.samples}{}
+\item{alpha.u2.samples}{}
+\item{phi.u1.samples}{}
+\item{phi.u2.samples}{}
+\item{eta1.samples}{}
+\item{eta2.samples}{}
+\item{sigma.t.square.samples}{}
+\item{sigma.u1.square.samples}{}
+\item{sigma.u2.square.samples}{}
+\item{pMean.logt.hat}{}
+\item{DIC}{}
+\item{WAIC}{}
 }
 \description{
 MCMC routine for the strucatural equation model
