@@ -75,10 +75,13 @@ mcmc <- function(ct, u1, u2, X, nthin = 1)
   phi.u2   <- rep(1, q2)
   
   sigma.t.square    <- 1
-  sigma.u1.square   <- 1
-  sigma.u2.square   <- 1
+  sigma.u1.square   <- rep(1, q1)
+  sigma.u2.square   <- rep(1, q2)
   sigma.eta1.square <- 1
   sigma.eta2.square <- 1
+  
+  alpha.sigmau <- 0.5
+  beta.sigmau  <- 0.5
   
   eta2 <- rnorm(n = 1, mean = 0, sd = 1)
   eta1 <- rnorm(n = 1, mean = eta2, sd = 1)
@@ -114,7 +117,7 @@ mcmc <- function(ct, u1, u2, X, nthin = 1)
     ## Update survival latent variable ##
     mean.impute       <- alpha.t + as.matrix(X.censored) %*% as.matrix(beta.t) + eta1 * phi.t
     sd.impute         <- sqrt(sigma.t.square)
-    time.censored     <- msm::rtnorm(n.censored, mean = mean.impute, sd = sd.impute, lower = logt.censored)
+    time.censored     <- rtnorm(n.censored, mean = mean.impute, sd = sd.impute, lower = logt.censored)
     logt[censored.id] <- time.censored  # truncated at log(time) for censored data
     
     
@@ -123,21 +126,21 @@ mcmc <- function(ct, u1, u2, X, nthin = 1)
     Ainv         <- chol2inv(chol(A))
     Sigma.beta.t <- sigma.t.square * Ainv
     mean.beta.t  <- as.vector(Ainv %*% t(X) %*% (logt - alpha.t - eta1 * phi.t))
-    beta.t       <- as.vector(MASS::mvrnorm(n = 1, mu = mean.beta.t, Sigma = Sigma.beta.t))
+    beta.t       <- as.vector(mvrnorm(n = 1, mu = mean.beta.t, Sigma = Sigma.beta.t))
     
     # Sample $ \alpha_t $
     A             <- crossprod(x = rep(1, n)) + chol2inv(chol(diag(1)))
     Ainv          <- chol2inv(chol(A))
     Sigma.alpha.t <- sigma.t.square * Ainv
     mean.alpha.t  <- as.vector(Ainv %*% t(rep(1, n)) %*% (logt - X %*% beta.t - eta1 * phi.t))
-    alpha.t       <- as.vector(MASS::mvrnorm(n = 1, mu = mean.alpha.t, Sigma = Sigma.alpha.t))
+    alpha.t       <- as.vector(mvrnorm(n = 1, mu = mean.alpha.t, Sigma = Sigma.alpha.t))
     
     # Sample $ \phi_t $
     A           <- crossprod(x = rep(eta1, n)) + chol2inv(chol(diag(1)))
     Ainv        <- chol2inv(chol(A))
     Sigma.phi.t <- Ainv
     mean.phi.t  <- as.vector(Ainv %*% t(rep(eta1, n)) %*% (logt - alpha.t - X %*% beta.t))
-    phi.t       <- as.vector(MASS::mvrnorm(n = 1, mu = mean.phi.t, Sigma = Sigma.phi.t))
+    phi.t       <- as.vector(mvrnorm(n = 1, mu = mean.phi.t, Sigma = Sigma.phi.t))
     
     # Sample $ \alpha_u1 $
     A             <- crossprod(x = rep(1, n)) + chol2inv(chol(diag(1)))
@@ -149,7 +152,7 @@ mcmc <- function(ct, u1, u2, X, nthin = 1)
     # Sample $ \alpha_u2 $
     A             <- crossprod(x = rep(1, n)) + chol2inv(chol(diag(1)))
     Ainv          <- chol2inv(chol(A))
-    Sigma.alpha.u <- sigma.u2.square * Ainv
+    Sigma.alpha.u <- as.vector(sigma.u2.square) * Ainv
     mean.alpha.u  <- as.vector(Ainv %*% t(rep(1, n)) %*% (u2 - eta2 * phi.u2))
     alpha.u2      <- as.vector(rnorm(n = q2, mean = mean.alpha.u, sd = sqrt(Sigma.alpha.u)))
     
@@ -172,25 +175,25 @@ mcmc <- function(ct, u1, u2, X, nthin = 1)
     sum.phi.eta1 <- 0
     for(k in 1:q1)
     {
-      sum.phi.eta1 <- sum.phi.eta1 + sum(phi.u1[k] * u1[, k])
+      sum.phi.eta1 <- sum.phi.eta1 + sum((phi.u1[k] * u1[, k])/sigma.u1.square[k])
     }
-    Sigma.eta <- 1/(1/sigma.eta1.square + sum(phi.u1^2)/sigma.u1.square)
-    mean.eta  <- Sigma.eta * (eta2/sigma.eta1.square + sum.phi.eta1/sigma.u1.square +
-                                phi.t * sum(logt)/sigma.t.square - sum(phi.u1 * alpha.u1)/sigma.u1.square -
+    Sigma.eta <- 1/(1/sigma.eta1.square + sum(phi.u1^2/sigma.u1.square))
+    mean.eta  <- Sigma.eta * (eta2/sigma.eta1.square + sum.phi.eta1 +
+                                phi.t * sum(logt)/sigma.t.square - sum((phi.u1 * alpha.u1)/sigma.u1.square) -
                                 phi.t * alpha.t/sigma.t.square -
                                 (t(beta.t) %*% t(X) %*% rep(phi.t, n))/sigma.t.square)
-    eta1      <- as.vector(MASS::mvrnorm(n = 1, mu = mean.eta, Sigma = Sigma.eta))
+    eta1      <- as.vector(mvrnorm(n = 1, mu = mean.eta, Sigma = Sigma.eta))
     
     # Sample $ \eta2 $
     sum.phi.eta2 <- 0
     for(l in 1:q2)
     {
-      sum.phi.eta2 <- sum.phi.eta2 + sum(phi.u2[l] * u2[, l])
+      sum.phi.eta2 <- sum.phi.eta2 + sum((phi.u2[l] * u2[, l])/sigma.u2.square[l])
     }
-    Sigma.eta <- 1/(1/sigma.eta1.square + 1/sigma.eta2.square + sum(phi.u2^2)/sigma.u2.square)
-    mean.eta  <- Sigma.eta * (eta1/sigma.eta1.square + sum.phi.eta2/sigma.u2.square +
-                                sum(phi.u2 * alpha.u2)/sigma.u2.square)
-    eta2      <- as.vector(MASS::mvrnorm(n = 1, mu = mean.eta, Sigma = Sigma.eta))
+    Sigma.eta <- 1/(1/sigma.eta1.square + 1/sigma.eta2.square + sum(phi.u2^2/sigma.u2.square))
+    mean.eta  <- Sigma.eta * (eta1/sigma.eta1.square + sum.phi.eta2 +
+                                sum((phi.u2 * alpha.u2)/sigma.u2.square))
+    eta2      <- as.vector(mvrnorm(n = 1, mu = mean.eta, Sigma = Sigma.eta))
     
     
     
@@ -206,17 +209,29 @@ mcmc <- function(ct, u1, u2, X, nthin = 1)
     #   sigma.t.square <- sigma.t.square.propesed
     # }
     
-    # # Sample $ \sigma_u1^2 
-    # E1 <- crossprod(x = u1 - alpha.u1 - eta1 * phi.u1)
-    # E3 <- crossprod(x = alpha.u1)
-    # E4 <- crossprod(x = phi.u1)
-    # sigma.u1.square <- 1/stats::rgamma(1, (n + 1)/2, scale = 2/(E1 + E3 + E4))
-    # 
-    # # Sample $ \sigma_u2^2 
-    # E1 <- crossprod(x = u2 - alpha.u2 - eta2 * phi.u2)
-    # E3 <- crossprod(x = alpha.u2)
-    # E4 <- crossprod(x = phi.u2)
-    # sigma.u2.square <- 1/stats::rgamma(1, (n + 1)/2, scale = 2/(E1 + E3 + E4))
+    # Sample $ \sigma_u1^2
+    E1 <- rep(NA, q1)
+    for(k in 1:q1)
+    {
+      E1[k] <- crossprod(x = u1[k] - alpha.u1 - eta1 * phi.u1)
+    }
+    
+    E3 <- crossprod(x = alpha.u1)
+    E4 <- crossprod(x = phi.u1)
+    sigma.u1.square <- 1/stats::rgamma(q1, alpha.sigmau + (n + 1)/2, 
+                                       scale = 1/(beta.sigmau + (as.vector(E1) + as.vector(E3) + as.vector(E4))/2))
+    
+    # Sample $ \sigma_u2^2
+    E1 <- rep(NA, q2)
+    for(k in 1:q2)
+    {
+      E1[k] <- crossprod(x = u2[k] - alpha.u2 - eta2 * phi.u2)
+    }
+    
+    E3 <- crossprod(x = alpha.u2)
+    E4 <- crossprod(x = phi.u2)
+    sigma.u2.square <- 1/stats::rgamma(q2, alpha.sigmau + (n + 1)/2, 
+                                       scale = 1/(beta.sigmau + (as.vector(E1) + as.vector(E3) + as.vector(E4))/2))
     
     
     logt.hat <- alpha.t + X %*% beta.t + eta1 * phi.t
@@ -243,8 +258,8 @@ mcmc <- function(ct, u1, u2, X, nthin = 1)
       eta2.out[(iter - nburnin)/nthin]      <- eta2
       
       sigma.t.square.out[(iter - nburnin)/nthin]  <- sigma.t.square
-      sigma.u1.square.out[(iter - nburnin)/nthin] <- sigma.u1.square
-      sigma.u2.square.out[(iter - nburnin)/nthin] <- sigma.u2.square
+      # sigma.u1.square.out[(iter - nburnin)/nthin] <- sigma.u1.square
+      # sigma.u2.square.out[(iter - nburnin)/nthin] <- sigma.u2.square
       
       logt.out[, (iter - nburnin)/nthin]        <- logt
       logt.hat.out[, (iter - nburnin)/nthin]    <- logt.hat
@@ -267,8 +282,8 @@ mcmc <- function(ct, u1, u2, X, nthin = 1)
   pMean.eta2     <- mean(eta2.out)
   
   pMean.sigma.t.square  <- median(sigma.t.square.out)
-  pMean.sigma.u1.square <- mean(sigma.u1.square.out)
-  pMean.sigma.u2.square <- mean(sigma.u2.square.out)
+  # pMean.sigma.u1.square <- mean(sigma.u1.square.out)
+  # pMean.sigma.u2.square <- mean(sigma.u2.square.out)
   
   pMean.logt     <- apply(logt.out, 1, mean)
   pMean.logt.hat <- apply(logt.hat.out, 1, mean)
@@ -295,9 +310,9 @@ mcmc <- function(ct, u1, u2, X, nthin = 1)
                 pMean.phi.u1 = pMean.phi.u1, pMean.phi.u2 = pMean.phi.u2, 
                 pMean.eta1 = pMean.eta1, pMean.eta2 = pMean.eta2, 
                 pMean.sigma.t.square = pMean.sigma.t.square, 
-                pMean.sigma.u1.square = pMean.sigma.u1.square, pMean.sigma.u2.square = pMean.sigma.u2.square,
+                # pMean.sigma.u1.square = pMean.sigma.u1.square, pMean.sigma.u2.square = pMean.sigma.u2.square,
                 alpha.t.samples = alpha.tout, phi.t.samples = phi.tout, 
-                beta1.t.samples = beta.tout[1, ], beta2.t.samples = beta.tout[2, ],
+                beta1.t.samples = beta.tout[1, ], #beta2.t.samples = beta.tout[2, ],
                 beta.t.samples = beta.tout,
                 alpha.u1.samples = alpha.u1out, alpha.u2.samples = alpha.u2out,
                 phi.u1.samples = phi.u1out, phi.u2.samples = phi.u2out, 
