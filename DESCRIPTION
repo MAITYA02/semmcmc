@@ -1,16 +1,18 @@
 Package: semmcmc
-Title: Bayesian Structural Equation Modeling in Lifetime Data with Application to Circadian Genes
-Version: 0.0.1
-Date: 2019-08-11
+Title: Bayesian Structural Equation Modeling in Multiple Omics Data Integration with Application to Circadian Genes
+Version: 0.0.2
+Date: 2021-04-20
 Authors@R: c(person("Arnab", "Maity", email = "arnab.maity@pfizer.com", role = c("aut", "cre")),
              person("Sang", "Chan Lee", email = "sangchan0624@gmail.com", role = "aut"),
              person("Bani", "K. Mallick", email = "bmallick@stat.tamu.edu", role = "aut"),
              person("Samsiddhi", "Bhattacharjee", email = "sb1@nibmg.ac.in", role = "aut"),
              person("Nidhan", "K. Biswas", email = "nkb1@nibmg.ac.in", role = "aut"))
-Description: Provides two the Markov Chain Monte Carlo (MCMC) routine for the structural equation modelling.
+Description: Provides Markov Chain Monte Carlo (MCMC) routine for the 
+             structural equation modelling described in 
+             Maity et. al. (2020) <doi: 10.1093/bioinformatics/btaa286>.
 Depends: R (>= 2.10)
 Imports: MASS, msm
 License: GPL-3
 Encoding: UTF-8
-LazyData: true
+LazyData: FALSE
 RoxygenNote: 7.1.1
