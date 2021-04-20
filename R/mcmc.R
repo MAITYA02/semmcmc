@@ -117,7 +117,7 @@ mcmc <- function(ct, u1, u2, X, nthin = 1)
     ## Update survival latent variable ##
     mean.impute       <- alpha.t + as.matrix(X.censored) %*% as.matrix(beta.t) + eta1 * phi.t
     sd.impute         <- sqrt(sigma.t.square)
-    time.censored     <- rtnorm(n.censored, mean = mean.impute, sd = sd.impute, lower = logt.censored)
+    time.censored     <- msm::rtnorm(n.censored, mean = mean.impute, sd = sd.impute, lower = logt.censored)
     logt[censored.id] <- time.censored  # truncated at log(time) for censored data
     
     
@@ -126,21 +126,21 @@ mcmc <- function(ct, u1, u2, X, nthin = 1)
     Ainv         <- chol2inv(chol(A))
     Sigma.beta.t <- sigma.t.square * Ainv
     mean.beta.t  <- as.vector(Ainv %*% t(X) %*% (logt - alpha.t - eta1 * phi.t))
-    beta.t       <- as.vector(mvrnorm(n = 1, mu = mean.beta.t, Sigma = Sigma.beta.t))
+    beta.t       <- as.vector(MASS::mvrnorm(n = 1, mu = mean.beta.t, Sigma = Sigma.beta.t))
     
     # Sample $ \alpha_t $
     A             <- crossprod(x = rep(1, n)) + chol2inv(chol(diag(1)))
     Ainv          <- chol2inv(chol(A))
     Sigma.alpha.t <- sigma.t.square * Ainv
     mean.alpha.t  <- as.vector(Ainv %*% t(rep(1, n)) %*% (logt - X %*% beta.t - eta1 * phi.t))
-    alpha.t       <- as.vector(mvrnorm(n = 1, mu = mean.alpha.t, Sigma = Sigma.alpha.t))
+    alpha.t       <- as.vector(MASS::mvrnorm(n = 1, mu = mean.alpha.t, Sigma = Sigma.alpha.t))
     
     # Sample $ \phi_t $
     A           <- crossprod(x = rep(eta1, n)) + chol2inv(chol(diag(1)))
     Ainv        <- chol2inv(chol(A))
     Sigma.phi.t <- Ainv
     mean.phi.t  <- as.vector(Ainv %*% t(rep(eta1, n)) %*% (logt - alpha.t - X %*% beta.t))
-    phi.t       <- as.vector(mvrnorm(n = 1, mu = mean.phi.t, Sigma = Sigma.phi.t))
+    phi.t       <- as.vector(MASS::mvrnorm(n = 1, mu = mean.phi.t, Sigma = Sigma.phi.t))
     
     # Sample $ \alpha_u1 $
     A             <- crossprod(x = rep(1, n)) + chol2inv(chol(diag(1)))
@@ -182,7 +182,7 @@ mcmc <- function(ct, u1, u2, X, nthin = 1)
                                 phi.t * sum(logt)/sigma.t.square - sum((phi.u1 * alpha.u1)/sigma.u1.square) -
                                 phi.t * alpha.t/sigma.t.square -
                                 (t(beta.t) %*% t(X) %*% rep(phi.t, n))/sigma.t.square)
-    eta1      <- as.vector(mvrnorm(n = 1, mu = mean.eta, Sigma = Sigma.eta))
+    eta1      <- as.vector(MASS::mvrnorm(n = 1, mu = mean.eta, Sigma = Sigma.eta))
     
     # Sample $ \eta2 $
     sum.phi.eta2 <- 0
@@ -193,7 +193,7 @@ mcmc <- function(ct, u1, u2, X, nthin = 1)
     Sigma.eta <- 1/(1/sigma.eta1.square + 1/sigma.eta2.square + sum(phi.u2^2/sigma.u2.square))
     mean.eta  <- Sigma.eta * (eta1/sigma.eta1.square + sum.phi.eta2 +
                                 sum((phi.u2 * alpha.u2)/sigma.u2.square))
-    eta2      <- as.vector(mvrnorm(n = 1, mu = mean.eta, Sigma = Sigma.eta))
+    eta2      <- as.vector(MASS::mvrnorm(n = 1, mu = mean.eta, Sigma = Sigma.eta))
     
     
     

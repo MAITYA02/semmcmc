@@ -3,7 +3,6 @@ Title: Bayesian Structural Equation Modeling in Lifetime Data with Application t
 Version: 0.0.1
 Date: 2019-08-11
 Authors@R: c(person("Arnab", "Maity", email = "arnab.maity@pfizer.com", role = c("aut", "cre")),
-             person("Tapasree", "Roy Sarkar", email = "tsarkar@bio.tamu.edu", role = "aut"),
              person("Sang", "Chan Lee", email = "sangchan0624@gmail.com", role = "aut"),
              person("Bani", "K. Mallick", email = "bmallick@stat.tamu.edu", role = "aut"),
              person("Samsiddhi", "Bhattacharjee", email = "sb1@nibmg.ac.in", role = "aut"),
@@ -14,4 +13,4 @@ Imports: MASS, msm
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
