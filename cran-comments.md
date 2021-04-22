@@ -7,4 +7,4 @@
 
 0 errors | 0 warnings | 1 note
 
-* This is a new release. The DOI is cirrect although submission produces a NOTE. This is    resubmission after addressing all the comments. 
+* This is a resubmission after addressing all the comments. The DOI is cirrect although submission produces a NOTE. 
