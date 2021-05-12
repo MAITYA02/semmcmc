@@ -7,4 +7,4 @@
 
 0 errors | 0 warnings | 1 note
 
-* This is a resubmission after addressing all the comments. The DOI is cirrect although submission produces a NOTE. 
+* This is a resubmission after rectifying the CITATION error. The DOI is correct although submission produces a NOTE. 

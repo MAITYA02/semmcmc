@@ -1,6 +1,6 @@
 Package: semmcmc
 Title: Bayesian Structural Equation Modeling in Multiple Omics Data Integration
-Version: 0.0.4
+Version: 0.0.5
 Date: 2021-04-20
 Authors@R: c(person("Arnab", "Maity", email = "arnab.maity@pfizer.com", role = c("aut", "cre")),
              person("Sang", "Chan Lee", email = "sangchan0624@gmail.com", role = "aut"),
@@ -13,7 +13,7 @@ Description: Provides Markov Chain Monte Carlo (MCMC) routine for the
              useful when one attempts to perform an integrative survival analysis for multiple 
              platforms of the Omics data where the response is time to event and the 
              predictors are different omics expressions for different platforms. 
-Depends: R (>= 2.10)
+Depends: R (>= 4.0)
 Imports: MASS, msm
 License: GPL-3
 Encoding: UTF-8
