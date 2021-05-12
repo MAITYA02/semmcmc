@@ -1,6 +1,6 @@
 Package: semmcmc
 Title: Bayesian Structural Equation Modeling in Multiple Omics Data Integration
-Version: 0.0.5
+Version: 0.0.6
 Date: 2021-04-20
 Authors@R: c(person("Arnab", "Maity", email = "arnab.maity@pfizer.com", role = c("aut", "cre")),
              person("Sang", "Chan Lee", email = "sangchan0624@gmail.com", role = "aut"),

@@ -13,4 +13,4 @@ bibentry(bibtype = "Manual",
                     person("Nidhan", "K. Biswas")),
          year = year,
          note = note,
-         url = "https://cran.r-project.org/web/packages/semmcmc/index.html")
+         url = "https://CRAN.R-project.org/package=semmcmc")
